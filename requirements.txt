@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+motor
+python-multipart
+verifyvoice
+numpy
+scikit-learn
+scipy
+sounddevice

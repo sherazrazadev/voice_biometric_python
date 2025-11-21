@@ -1,0 +1,34 @@
+services:
+  voice-auth-api:
+    build: .
+    container_name: voice_auth_container
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist the 'storage' folder (Audio + ChromaDB)
+      - ./storage:/app/storage
+    environment:
+      - MONGO_URL=mongodb+srv://sherazrazaoctaloop:raza87654321@myfreecluster.k849b1v.mongodb.net/
+    depends_on:
+      - mongo_db
+
+  voice-auth-client:
+    build: ./client
+    container_name: voice_auth_client
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - voice-auth-api
+
+  mongo_db:
+    image: mongo:latest
+    container_name: voice_auth_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
