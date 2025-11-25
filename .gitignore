@@ -11,8 +11,9 @@ experiment/
 .venv/
 .env
 .venv/
-client/
 sqlite_dll/
 .vscode/
 venv2/
-
+storage/
+client/node_modules
+client/.next

@@ -3,7 +3,7 @@ services:
     build: .
     container_name: voice_auth_container
     ports:
-      - "8000:8000"
+      - "8007:8000"
     volumes:
       # Persist the 'storage' folder (Audio + ChromaDB)
       - ./storage:/app/storage
@@ -17,12 +17,12 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://18.206.13.3:8007}
     container_name: voice_auth_client
     ports:
-      - "3000:3000"
+      - "8008:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://18.206.13.3:8007
     depends_on:
       - voice-auth-api
 
