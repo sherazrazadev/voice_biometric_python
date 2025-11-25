@@ -8,11 +8,24 @@ export default function VoiceAuth() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [status, setStatus] = useState("");
   const [score, setScore] = useState<number | null>(null);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
+    setStatus("");
+
+    // Check for Secure Context (HTTPS or localhost)
+    if (!window.isSecureContext) {
+      setStatus("⚠️ Error: Microphone access requires HTTPS or localhost. You are on an insecure connection (HTTP).");
+      return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setStatus("⚠️ Error: Your browser does not support audio recording.");
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -31,10 +44,16 @@ export default function VoiceAuth() {
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
-      setStatus("Recording...");
-    } catch (err) {
+      setStatus("Recording... Speak now!");
+    } catch (err: any) {
       console.error("Error accessing microphone:", err);
-      setStatus("Error accessing microphone");
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        setStatus("❌ Permission denied. Please allow microphone access in your browser settings.");
+      } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        setStatus("❌ No microphone found. Please connect a microphone.");
+      } else {
+        setStatus(`❌ Error accessing microphone: ${err.message}`);
+      }
     }
   };
 
@@ -43,7 +62,7 @@ export default function VoiceAuth() {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setStatus("Recording stopped. Ready to submit.");
-      
+
       // Stop all tracks to release microphone
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     }
@@ -73,9 +92,9 @@ export default function VoiceAuth() {
       if (response.ok) {
         setStatus(data.message || "Success!");
         if (data.score !== undefined) {
-            setScore(data.score);
+          setScore(data.score);
         } else {
-            setScore(null);
+          setScore(null);
         }
       } else {
         setStatus(`Error: ${data.detail || "Unknown error"}`);
@@ -90,7 +109,7 @@ export default function VoiceAuth() {
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md space-y-4 text-gray-900">
       <h2 className="text-xl font-bold text-center text-gray-800">Voice Authentication</h2>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700">User ID</label>
         <input
@@ -148,10 +167,10 @@ export default function VoiceAuth() {
           {status}
         </div>
       )}
-      
+
       {score !== null && (
         <div className="text-center font-mono text-lg">
-            Match Score: <span className={score > 0.75 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>{score.toFixed(4)}</span>
+          Match Score: <span className={score > 0.75 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>{score.toFixed(4)}</span>
         </div>
       )}
     </div>
