@@ -10,3 +10,9 @@ experiment/
 .venv
 .venv/
 .env
+.venv/
+client/
+sqlite_dll/
+.vscode/
+venv2/
+

@@ -13,7 +13,11 @@ services:
       - mongo_db
 
   voice-auth-client:
-    build: ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     container_name: voice_auth_client
     ports:
       - "3000:3000"

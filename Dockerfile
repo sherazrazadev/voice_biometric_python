@@ -16,6 +16,8 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 ENV HF_HOME="/app/model_cache"
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
+# Increase timeout for large downloads (like torch/nvidia libs)
+ENV UV_HTTP_TIMEOUT=300
 
 WORKDIR /app
 

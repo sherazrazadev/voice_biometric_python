@@ -4,3 +4,5 @@ __pycache__
 storage
 client/node_modules
 client/.next
+venv2/
+.vscode/
